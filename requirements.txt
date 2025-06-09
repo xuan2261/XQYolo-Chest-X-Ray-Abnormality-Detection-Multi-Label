@@ -6,3 +6,12 @@ scikeras
 streamlit
 dill
 psutil
+psutil
+torch
+torchvision
+matplotlib
+pyyaml
+tqdm
+timm==0.6.7
+einops
+pydicom
