@@ -196,7 +196,7 @@ def main():
     # Display each image in a column with a "Detect" button underneath
     for idx, (column, image_path) in enumerate(zip(columns, image_paths)):
         resized_image = resize_image(image_path, image_width, image_height)
-        column.image(resized_image, caption=f"Chest X-Ray {idx + 1}", use_column_width=True)
+        column.image(resized_image, caption=f"Chest X-Ray {idx + 1}", use_container_width=True)
 
         # Add a "Detect" button centered below each image
         if column.button(f"Detect {idx + 1}"):
@@ -222,10 +222,10 @@ def main():
         # Check if it's a DICOM file or regular image
         if is_valid_dicom(uploaded_file):
             image = dicom_to_image(uploaded_file)
-            st.image(image, caption="Uploaded DICOM Image", use_column_width=True)
+            st.image(image, caption="Uploaded DICOM Image", use_container_width=True)
         else:
             image = Image.open(uploaded_file)
-            st.image(image, caption="Uploaded Image", use_column_width=True)
+            st.image(image, caption="Uploaded Image", use_container_width=True)
 
         # Preprocess the uploaded image
         input_data = preprocess_image(image)
@@ -256,7 +256,7 @@ def main():
     
     # Sidebar information
     st.sidebar.title('About the Creator')
-    st.sidebar.image("app_images/headshot.jpg", use_column_width=True)
+    st.sidebar.image("app_images/headshot.jpg", use_container_width=True)
 
     linkedin_url = "https://www.linkedin.com/in/b%C3%B9i-xu%C3%A2n-bb9120170/"
     github_url = "https://github.com/xuan2261/"
