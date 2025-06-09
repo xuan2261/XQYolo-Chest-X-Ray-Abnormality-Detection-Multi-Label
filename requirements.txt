@@ -9,4 +9,4 @@ psutil
 torch
 torchvision
 matplotlib
-yaml
+pyyaml
