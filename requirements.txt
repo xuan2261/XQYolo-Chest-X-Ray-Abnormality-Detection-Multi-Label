@@ -6,3 +6,5 @@ scikeras
 streamlit
 dill
 psutil
+torch
+torchvision
