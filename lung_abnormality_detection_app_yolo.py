@@ -196,7 +196,7 @@ def main():
     # Display each image in a column with a "Detect" button underneath
     for idx, (column, image_path) in enumerate(zip(columns, image_paths)):
         resized_image = resize_image(image_path, image_width, image_height)
-        column.image(resized_image, caption=f"Chest X-Ray {idx + 1}", use_column_width=True)
+        column.image(resized_image, caption=f"Chest X-Ray {idx + 1}", use_container_width=True)
 
         # Add a "Detect" button centered below each image
         if column.button(f"Detect {idx + 1}"):
@@ -222,10 +222,10 @@ def main():
         # Check if it's a DICOM file or regular image
         if is_valid_dicom(uploaded_file):
             image = dicom_to_image(uploaded_file)
-            st.image(image, caption="Uploaded DICOM Image", use_column_width=True)
+            st.image(image, caption="Uploaded DICOM Image", use_container_width=True)
         else:
             image = Image.open(uploaded_file)
-            st.image(image, caption="Uploaded Image", use_column_width=True)
+            st.image(image, caption="Uploaded Image", use_container_width=True)
 
         # Preprocess the uploaded image
         input_data = preprocess_image(image)
@@ -248,15 +248,15 @@ def main():
     st.write("   ")
     st.markdown("---")
 
-    github_project_url = "https://github.com/xuan2261/Chest-X-Ray-Abnormality-Detection-Multi-Label-Yolo"
+    github_project_url = "https://github.com/xuan2261/XQYolo-Chest-X-Ray-Abnormality-Detection-Multi-Label"
     github_project_markdown = f'[GitHub]({github_project_url})'
 
     st.write("   ")
-    st.write(f"This A.I. tool is based on Yolo detect model using Python. The model currently has an Box(P  R  mAP50  mAP50-95): (0.479  0.467  0.446  0.258) and can be found in {github_project_markdown}. Please feel free to connect with me on LinkedIn or via email. Feedback is welcome!") 
+    st.write(f"This A.I. tool is based on Yolo detect model using Python. The model currently has an Box(P  R  mAP50  mAP50-95): (0.476  0.446  0.432  0.274) and can be found in {github_project_markdown}. Please feel free to connect with me on LinkedIn or via email. Feedback is welcome!") 
     
     # Sidebar information
     st.sidebar.title('About the Creator')
-    st.sidebar.image("app_images/headshot.jpg", use_column_width=True)
+    st.sidebar.image("app_images/headshot.jpg", use_container_width=True)
 
     linkedin_url = "https://www.linkedin.com/in/b%C3%B9i-xu%C3%A2n-bb9120170/"
     github_url = "https://github.com/xuan2261/"

@@ -5,3 +5,4 @@ Pillow
 scikeras
 streamlit
 dill
+psutil

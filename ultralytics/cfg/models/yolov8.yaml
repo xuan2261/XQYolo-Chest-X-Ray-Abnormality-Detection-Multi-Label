@@ -1,0 +1,51 @@
+# YOLOv8 X-Ray Anomaly Detection - Cấu hình với DynamicHead Head
+# Dựa trên yolov8-xray-anomaly_Goc.yaml
+# Ultralytics YOLO 🚀, AGPL-3.0 license
+
+# Parameters
+nc: 14  # số lượng classes cho X-quang
+depth_multiple: 0.67
+width_multiple: 0.75
+max_channels: 768
+
+# Các thông số liên quan đến loss và assign strategy
+loss: 'Focal_WIoU'  # Giữ nguyên loss, phù hợp cho đối tượng nhỏ và khó
+newhead: DynamicHead  # Thay đổi head thành DynamicHead
+
+# YOLOv8 backbone
+backbone:
+  # [from, repeats, module, args]
+  - [-1, 1, Conv, [64, 3, 2]]  # 0-P1/2
+  - [-1, 1, Conv, [128, 3, 2]]  # 1-P2/4
+  - [-1, 3, C2f, [128, True]]  # 2
+  - [-1, 1, Conv, [256, 3, 2]]  # 3-P3/8
+  - [-1, 6, C2f, [256, True]]  # 4 - Sử dụng C2f tiêu chuẩn cho ổn định
+  - [-1, 1, Conv, [512, 3, 2]]  # 5-P4/16
+  - [-1, 6, C2f, [512, True]]  # 6
+  - [-1, 1, Conv, [1024, 3, 2]]  # 7-P5/32
+  - [-1, 3, C2f, [1024, True]]  # 8
+  - [-1, 1, SPPFCSPC, [1024]]  # 9 - Cải thiện SPPF với SPPFCSPC cho đa tỷ lệ tốt hơn
+
+# YOLOv8 head - tăng cường với FocalNeXt và CBAM
+head:
+  - [-1, 1, nn.Upsample, [None, 2, "nearest"]]  # 10
+  - [[-1, 6], 1, Concat, [1]]  # 11 (P4)
+  - [-1, 3, C2f, [512]]  # 12
+
+  - [-1, 1, nn.Upsample, [None, 2, "nearest"]]  # 13
+  - [[-1, 4], 1, Concat, [1]]  # 14 (P3)
+  - [-1, 3, C2f_FocalNeXt, [256]]  # 15 (P3/8-small) - FocalNeXt tốt cho phát hiện chi tiết nhỏ
+  - [-1, 1, CBAM, [256]]  # 16 (P3) - CBAM tăng cường phân biệt vùng quan trọng
+
+  - [-1, 1, Conv, [256, 3, 2]]  # 17
+  - [[-1, 12], 1, Concat, [1]]  # 18 (P4)
+  - [-1, 3, C2f_FocalNeXt, [512]]  # 19 (P4/16-medium) - FocalNeXt cho P4
+  - [-1, 1, CBAM, [512]]  # 20 (P4) - CBAM tăng cường P4
+
+  - [-1, 1, Conv, [512, 3, 2]]  # 21
+  - [[-1, 9], 1, Concat, [1]]  # 22 (P5)
+  - [-1, 3, C2f_FocalNeXt, [1024]]  # 23 (P5/32-large) - FocalNeXt cho P5
+  - [-1, 1, CBAM, [1024]]  # 24 (P5) - CBAM tăng cường P5
+
+  # Lớp Detect sẽ tự động sử dụng DynamicHead do tham số 'newhead' ở trên
+  - [[16, 20, 24], 1, Detect, [nc]]  # Detect(P3-CBAM, P4-CBAM, P5-CBAM)
