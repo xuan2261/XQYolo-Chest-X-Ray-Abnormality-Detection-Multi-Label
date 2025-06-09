@@ -115,7 +115,7 @@ def load_script():
                         print(f"DEBUG: Sử dụng cấu hình từ biến môi trường: {original_path}")
                     else:
                         # Sử dụng đường dẫn mặc định
-                        original_path = "cfg/models/yolov8.yaml"
+                        original_path = "xqyolo.yaml"
                         print(f"DEBUG: Sử dụng đường dẫn mặc định: {original_path}")
         else:
             # Chế độ bình thường, lấy từ tham số dòng lệnh
