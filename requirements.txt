@@ -1,0 +1,8 @@
+﻿opencv-python-headless
+joblib
+numpy
+Pillow
+scikeras
+streamlit
+ultralytics
+dill
