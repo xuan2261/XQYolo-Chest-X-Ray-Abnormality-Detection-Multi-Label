@@ -1,0 +1,123 @@
+# Tệp: modules/gpa_head.py
+
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+from ultralytics.nn.modules.block import Conv
+
+class GPAdetect(nn.Module):
+    """
+    Global Perception Aggregation Detection Head (GPAdetect) cho NSEC-YOLO.
+    """
+    def __init__(self, nc=80, channels=256):
+        super(GPAdetect, self).__init__()
+        self.nc = nc  # Số lượng classes
+        self.no = nc + 5  # Số lượng outputs mỗi anchor (classes + box)
+        self.nl = 1  # Số lượng detection layers cho head này
+        
+        # Các convolution layers cho detection
+        self.cv1 = Conv(channels, channels, 3, 1)
+        self.cv2 = Conv(channels, channels, 3, 1)
+        
+        # Global Perception Aggregation Module (GPA)
+        self.gpa = GPAModule(channels)
+        
+        # Output layers (classification and bbox regression)
+        self.cv_cls = nn.Conv2d(channels, nc, 1)  # Classification layer
+        self.cv_box = nn.Conv2d(channels, 4, 1)   # Box regression layer
+        self.cv_obj = nn.Conv2d(channels, 1, 1)   # Objectness layer
+    
+    def forward(self, x):
+        """
+        Forward pass của GPAdetect head.
+        
+        Args:
+            x: Tensor đầu vào [batch_size, channels, height, width]
+            
+        Returns:
+            Tuple (pred_boxes, pred_cls, pred_obj): Prediction tensors
+        """
+        # Feature processing
+        x = self.cv1(x)
+        x = self.gpa(x)  # Apply Global Perception Aggregation
+        x = self.cv2(x)
+        
+        # Detection heads
+        pred_cls = self.cv_cls(x)
+        pred_box = self.cv_box(x)
+        pred_obj = self.cv_obj(x)
+        
+        # Reshape cho output
+        bs, _, ny, nx = x.shape
+        pred_cls = pred_cls.permute(0, 2, 3, 1).reshape(bs, -1, self.nc)
+        pred_box = pred_box.permute(0, 2, 3, 1).reshape(bs, -1, 4)
+        pred_obj = pred_obj.permute(0, 2, 3, 1).reshape(bs, -1, 1)
+        
+        # Concatenate predictions
+        output = torch.cat([pred_box, pred_obj, pred_cls], dim=2)
+        
+        return output
+
+
+class GPAModule(nn.Module):
+    """
+    Global Perception Aggregation Module cho detection head của NSEC-YOLO.
+    """
+    def __init__(self, channels, num_branches=4, reduction=16):
+        super(GPAModule, self).__init__()
+        self.channels = channels
+        self.num_branches = num_branches
+        
+        # Global Average Pooling (Squeeze)
+        self.avg_pool = nn.AdaptiveAvgPool2d(1)
+        
+        # Multi-branch fully connected layers (Excitation)
+        self.branches = nn.ModuleList()
+        for _ in range(num_branches):
+            self.branches.append(
+                nn.Sequential(
+                    nn.Linear(channels, channels // reduction, bias=False),
+                    nn.ReLU(inplace=True),
+                    nn.Linear(channels // reduction, channels, bias=False)
+                )
+            )
+        
+        # Final sigmoid activation
+        self.sigmoid = nn.Sigmoid()
+        
+        # Residual connection
+        self.has_residual = True
+    
+    def forward(self, x):
+        """
+        Forward pass của GPA Module.
+        
+        Args:
+            x: Tensor đầu vào [batch_size, channels, height, width]
+            
+        Returns:
+            Tensor đầu ra đã được tăng cường bởi GPA
+        """
+        batch_size, c, h, w = x.size()
+        
+        # Global Average Pooling (Squeeze operation)
+        y = self.avg_pool(x).view(batch_size, c)
+        
+        # Multi-branch Excitation
+        s = torch.zeros_like(y).to(y.device)
+        for branch in self.branches:
+            s_branch = branch(y)
+            s = s + s_branch  # Aggregation of branch outputs
+        
+        # Average the aggregated outputs and apply sigmoid
+        s = s / self.num_branches
+        s = self.sigmoid(s).view(batch_size, c, 1, 1)
+        
+        # Scale the input tensor (Scale operation)
+        scaled = x * s
+        
+        # Residual connection
+        if self.has_residual:
+            return x + scaled
+        else:
+            return scaled

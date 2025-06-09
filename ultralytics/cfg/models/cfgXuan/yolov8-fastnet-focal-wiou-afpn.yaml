@@ -1,0 +1,55 @@
+# YOLOv8-FasterNet-Focal-WIoU-DynamicHead-AFPN.yaml
+# Ultralytics YOLO 🚀, AGPL-3.0 license
+
+nc: 16  # Số lượng lớp
+scale: x  # Chỉ định scale là 'x'
+
+scales:
+  n: [0.33, 0.25, 1024]  # YOLOv8n summary
+  s: [0.33, 0.50, 1024]  # YOLOv8s summary
+  m: [0.67, 0.75, 768]    # YOLOv8m summary
+  l: [1.00, 1.00, 512]    # YOLOv8l summary
+  x: [1.00, 1.25, 512]    # YOLOv8x summary
+
+# Các thông số liên quan đến loss và assign strategy
+loss: 'Focal_WIoU' # Give an example，If used Focal_WIoU If the loss function, That is, modify the corresponding name
+newhead: DynamicHead
+
+# Backbone: FasterNet
+backbone:
+  # [from, repeats, module, args]
+  - [-1, 1, Conv, [64, 3, 2]]  # 0-P1/2
+  - [-1, 1, Conv, [128, 3, 2]]  # 1-P2/4
+  - [-1, 3, FasterNeXt, [128]]
+  - [-1, 1, Conv, [256, 3, 2]]  # 3-P3/8
+  - [-1, 6, FasterNeXt, [256]]
+  - [-1, 1, Conv, [512, 3, 2]]  # 5-P4/16
+  - [-1, 6, FasterNeXt, [512]]
+  - [-1, 1, Conv, [1024, 3, 2]]  # 7-P5/32
+  - [-1, 3, FasterNeXt, [1024]]
+  - [-1, 3, CBAM, [1024]]
+  - [-1, 1, SPPF, [1024, 5]]  # 10
+
+# YOLOv8-AFPN head
+head:
+  - [4, 1, Conv, [64, 1, 1]]   # 11
+  - [6, 1, Conv, [128, 1, 1]]
+  - [10, 1, Conv, [256, 1, 1]]
+  - [11, 1, Conv, [64, 1, 1]]
+  - [12, 1, Conv, [128, 1, 1]]
+  - [13, 1, Conv, [256, 1, 1]]
+  - [[14, 15], 1, ASFF_2, [64, 0]]  
+  - [[14, 15], 1, ASFF_2, [128, 1]]  
+  - [17, 1, BasicBlock, [64]]
+  - [18, 1, BasicBlock, [128]]
+  - [[19, 20, 16], 1, ASFF_3, [64, 0]]  
+  - [[19, 20, 16], 1, ASFF_3, [128, 1]] 
+  - [[19, 20, 16], 1, ASFF_3, [256, 2]]
+  - [21, 1, BasicBlock, [64]]
+  - [22, 1, BasicBlock, [128]]
+  - [23, 1, BasicBlock, [256]]
+  - [24, 1, Conv, [256, 1, 1]]
+  - [25, 1, Conv, [512, 1, 1]]
+  - [26, 1, Conv, [1024, 1, 1]]
+
+  - [[27, 28, 29], 1, Detect, [nc]]  # DynamicHead(P3, P4, P5) # The use here is DynamicHead Detection head
