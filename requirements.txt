@@ -11,4 +11,4 @@ torchvision
 matplotlib
 pyyaml
 tqdm
-timm
+timm==0.6.7
