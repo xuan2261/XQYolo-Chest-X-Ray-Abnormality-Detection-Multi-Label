@@ -10,3 +10,4 @@ torch
 torchvision
 matplotlib
 pyyaml
+tqdm
