@@ -7,6 +7,10 @@ from ultralytics import YOLO
 import time
 import pydicom
 
+import torch
+model_data = torch.load("XQYolo-best.pt", map_location="cpu")
+print(model_data.keys())
+
 # Load YOLO model
 model = YOLO('XQYolo-best.pt')  # Replace with your actual YOLO model path
 
