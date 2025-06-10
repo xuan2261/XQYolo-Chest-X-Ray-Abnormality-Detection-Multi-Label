@@ -231,7 +231,7 @@ def main():
         input_data = preprocess_image(image)
         
         # Adjust confidence threshold and IoU threshold
-        conf_threshold = 0.5  # Tùy chỉnh ngưỡng confidence
+        conf_threshold = 0.15  # Tùy chỉnh ngưỡng confidence
         iou_threshold = 0.4  # Tùy chỉnh ngưỡng IoU
 
         if st.button("Detect Abnormalities"):
