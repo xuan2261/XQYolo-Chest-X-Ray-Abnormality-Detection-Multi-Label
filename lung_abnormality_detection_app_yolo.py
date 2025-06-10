@@ -153,8 +153,14 @@ def main():
     st.write("This tool uses YOLO for detecting lung abnormalities in chest X-rays.")
     st.markdown("---")
     
-    conf_threshold = st.slider("Set Confidence Threshold", 0.0, 1.0, 0.15)
-    iou_threshold = st.slider("Set IoU Threshold", 0.0, 1.0, 0.4)
+    # Dùng st.columns để đặt slider cạnh nhau
+    col1, col2 = st.columns(2)
+
+    with col1:
+        conf_threshold = st.slider("Set Confidence Threshold", 0.0, 1.0, 0.15)
+
+    with col2:
+        iou_threshold = st.slider("Set IoU Threshold", 0.0, 1.0, 0.40)
 
     uploaded_file = st.file_uploader("Choose an image...", type=["dicom", "png", "jpg", "jpeg"])
 
