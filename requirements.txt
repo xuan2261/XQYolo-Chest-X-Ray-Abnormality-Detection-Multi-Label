@@ -6,7 +6,7 @@ scikeras
 streamlit
 dill
 psutil
-torch==2.6.0
+torch
 torchvision
 matplotlib
 pyyaml
