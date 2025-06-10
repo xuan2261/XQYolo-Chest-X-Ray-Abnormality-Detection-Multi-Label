@@ -10,7 +10,7 @@ import pydicom
 # Load YOLO model
 model = YOLO('XQYolo-best.pt')  # Replace with your actual YOLO model path
 
-print(model.info())
+model
 
 # Class mapping for YOLO detections
 class_mapping = {
