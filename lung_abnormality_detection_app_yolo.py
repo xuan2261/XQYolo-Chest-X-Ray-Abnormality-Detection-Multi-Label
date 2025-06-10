@@ -229,11 +229,17 @@ def main():
 
         # Preprocess the uploaded image
         input_data = preprocess_image(image)
+        
+        # Adjust confidence threshold and IoU threshold
+        conf_threshold = 0.5  # Tùy chỉnh ngưỡng confidence
+        iou_threshold = 0.4  # Tùy chỉnh ngưỡng IoU
 
         if st.button("Detect Abnormalities"):
             with st.spinner("Model is making predictions..."):
                 # Make predictions with YOLO
-                results = model(input_data)
+                #results = model(input_data)
+                # Dự đoán với tham số tùy chỉnh
+                results = model(image_data, conf=conf_threshold, iou=iou_threshold)
                 # Draw bounding boxes on the uploaded image
                 output_image, info_list, color_list = draw_bounding_boxes(image.copy(), results)
                 st.image(output_image, caption="Predictions with Bounding Boxes")
