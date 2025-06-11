@@ -93,15 +93,16 @@ def dicom_to_image(dicom_file):
         st.error(f"Lỗi khi đọc tệp DICOM: {e}")
         return None
 
-def preprocess_image(image):
+def preprocess_image(image, target_size=(640, 640)):
     try:
+        image = image.resize(target_size)
         image_array = np.array(image)
         if image_array.ndim == 2:
             image_array = np.stack((image_array,) * 3, axis=-1)
-        return image_array
+        return image_array, image  # Trả về cả array cho YOLO và ảnh PIL resized
     except Exception as e:
         st.warning("Please upload a valid radiograph.")
-        return None
+        return None, None
 
 def draw_bounding_boxes(image, results):
     if image.mode != "RGB":
@@ -167,12 +168,14 @@ def main():
     if uploaded_file is not None:
         if is_valid_dicom(uploaded_file):
             image = dicom_to_image(uploaded_file)
-            st.image(image, caption="Uploaded DICOM Image", use_container_width=True)
         else:
             image = Image.open(uploaded_file)
-            st.image(image, caption="Uploaded Image", use_container_width=True)
+        
+        # Resize for consistent display and processing
+        input_data, resized_image = preprocess_image(image)
 
-        input_data = preprocess_image(image)
+        # Hiển thị ảnh upload sau resize đồng bộ
+        st.image(resized_image, caption="Uploaded Image", use_container_width=True)
 
         if st.button("Detect Abnormalities"):
             with st.spinner("Model is making predictions..."):
