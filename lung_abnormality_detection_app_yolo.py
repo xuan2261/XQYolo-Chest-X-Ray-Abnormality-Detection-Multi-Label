@@ -180,7 +180,7 @@ def main():
         if st.button("Detect Abnormalities"):
             with st.spinner("Model is making predictions..."):
                 results = model(input_data, conf=conf_threshold, iou=iou_threshold)
-                output_image, info_list, color_list = draw_bounding_boxes(image.copy(), results)
+                output_image, info_list, color_list = draw_bounding_boxes(resized_image.copy(), results)
                 st.image(output_image, caption="Predictions with Bounding Boxes", use_container_width=True)
                 if info_list:
                     st.write("### Detected Abnormalities and Confidence:")
