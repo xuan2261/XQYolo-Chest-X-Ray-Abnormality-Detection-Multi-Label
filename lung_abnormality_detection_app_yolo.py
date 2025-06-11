@@ -30,11 +30,13 @@ class_mapping = {
     15: 'Abnormalities Detected'
 }
 
-# Define colors for each label (excluding "No Abnormalities Detected")
+# Define colors for each label (excluding "No Abnormalities Detected" & 'Abnormalities Detected')
 label2color = [
     [59, 238, 119], [222, 21, 229], [94, 49, 164], [206, 221, 133], [117, 75, 3],
     [210, 224, 119], [211, 176, 166], [63, 7, 197], [102, 65, 77], [194, 134, 175],
-    [209, 219, 50], [255, 44, 47], [89, 125, 149], [110, 27, 100], [255, 0, 0]
+    [209, 219, 50], [255, 44, 47], [89, 125, 149], [110, 27, 100],
+    [0, 255, 0],   # Màu xanh lá cho lớp 14: "No Abnormalities Detected"
+    [255, 0, 0]     # Màu đỏ tươi cho lớp 15: "Abnormalities Detected"
 ]
 
 # Convert list of RGB values to tuple for easier usage with PIL
@@ -125,7 +127,7 @@ def draw_bounding_boxes(image, results):
             class_id = int(box.cls[0])
             confidence = box.conf[0]
 
-            if class_id < 16: # chỉnh class_id < 14: để giới hạn không hiển thị lớp Finding và No finding
+            if class_id < 20: # chỉnh class_id < 14: để giới hạn không hiển thị lớp Finding và No finding
                 color = tuple(map(int, label2color[class_id]))
                 label = class_mapping.get(class_id, "Unknown")
                 x_min, y_min, x_max, y_max = box.xyxy[0].tolist()
