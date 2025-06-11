@@ -26,7 +26,8 @@ class_mapping = {
     11: 'Pleural Thickening',
     12: 'Pneumothorax',
     13: 'Pulmonary Fibrosis',
-    14: 'No Abnormalities Detected'
+    14: 'No Abnormalities Detected',
+    15: 'Abnormalities Detected'
 }
 
 # Define colors for each label (excluding "No Abnormalities Detected")
@@ -124,7 +125,7 @@ def draw_bounding_boxes(image, results):
             class_id = int(box.cls[0])
             confidence = box.conf[0]
 
-            if class_id < 14:
+            #if class_id < 14:
                 color = tuple(map(int, label2color[class_id]))
                 label = class_mapping.get(class_id, "Unknown")
                 x_min, y_min, x_max, y_max = box.xyxy[0].tolist()
