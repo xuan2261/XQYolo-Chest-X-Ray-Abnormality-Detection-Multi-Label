@@ -125,7 +125,7 @@ def draw_bounding_boxes(image, results):
             class_id = int(box.cls[0])
             confidence = box.conf[0]
 
-            #if class_id < 14:
+            if class_id < 16: # chỉnh class_id < 14: để giới hạn không hiển thị lớp Finding và No finding
                 color = tuple(map(int, label2color[class_id]))
                 label = class_mapping.get(class_id, "Unknown")
                 x_min, y_min, x_max, y_max = box.xyxy[0].tolist()
