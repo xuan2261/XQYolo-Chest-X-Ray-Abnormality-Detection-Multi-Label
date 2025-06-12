@@ -152,9 +152,9 @@ def draw_bounding_boxes(image, results):
     return image, info_list, color_list
 
 def main():
-    st.title("Lung Abnormality Detection with YOLO")
+    st.title("Lung Abnormality Detection with XQ-YOLO")
 
-    st.write("This tool uses YOLO for detecting lung abnormalities in chest X-rays.")
+    st.write("This tool uses XQ-YOLO for detecting lung abnormalities in chest X-rays.")
     st.markdown("---")
     
     # Dùng st.columns để đặt slider cạnh nhau
